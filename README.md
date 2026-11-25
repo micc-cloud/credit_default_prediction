@@ -1,44 +1,44 @@
-# 信用卡違約預測 — Credit Default Prediction
+# Credit Card Default Prediction
 
-UCI「Default of Credit Card Clients」數據集（台灣信用卡客戶，2005 年 4–9 月，30,000 行），目標係預測下個月有無違約。適用職位：銀行 Data Analyst、Credit Risk Analyst。對照文件：`../credit-default-project-skeleton/credit-default-project-skeleton.docx`（項目骨架，含 SQL 清洗清單、Power BI 規格、面試講法）。
+UCI "Default of Credit Card Clients" dataset (Taiwan credit card clients, April–September 2005, 30,000 rows). The goal is to predict whether a client will default next month. Target roles: Bank Data Analyst and Credit Risk Analyst. Companion document: `../credit-default-project-skeleton/credit-default-project-skeleton.docx` (project skeleton, with the SQL cleaning checklist, Power BI specification, and interview talking points).
 
-> 提醒：這是 2005 年的台灣舊數據，只適合做作品集示範，不代表現時香港市場，亦不是任何銀行的真實授信模型。
+> Note: This is old data from Taiwan in 2005. It is suitable only as a portfolio demonstration. It does not represent the current Hong Kong market, and it is not a real credit model used by any bank.
 
-## 檔案結構
+## File structure
 
 ```
 credit-default-project/
 ├── data/
-│   ├── raw/          # UCI 原始檔（已附上，唔使再下載）
-│   └── processed/    # credit_features.csv（01 號筆記本產出）
+│   ├── raw/          # Original UCI file (included, no need to download again)
+│   └── processed/    # credit_features.csv (output of notebook 01)
 ├── notebooks/
-│   ├── 01_eda.ipynb                  # 探索分析（已跑通）
-│   └── 02_baseline_logistic.ipynb   # Logistic regression baseline（已跑通）
+│   ├── 01_eda.ipynb                  # Exploratory analysis (runs clean)
+│   └── 02_baseline_logistic.ipynb   # Logistic regression baseline (runs clean)
 ├── reports/
-│   └── model_results.csv             # 模型結果表
+│   └── model_results.csv             # Model results table
 └── README.md
 ```
 
-## 點樣跑
+## How to run
 
-1. 安裝需求：`pip install pandas scikit-learn matplotlib python-calamine`
-   （pandas 較舊版本改用 `xlrd` 讀 `.xls`。）
-2. 按順序跑 `01_eda.ipynb` → `02_baseline_logistic.ipynb`（Restart & Run All）。
-3. 原始數據已放喺 `data/raw/`，唔使再下載；路徑會自動搵項目根目錄。
+1. Install the requirements: `pip install pandas scikit-learn matplotlib python-calamine`
+   (On older pandas versions, use `xlrd` to read the `.xls` file.)
+2. Run the notebooks in order: `01_eda.ipynb` → `02_baseline_logistic.ipynb` (Restart & Run All).
+3. The raw data is already in `data/raw/`; there is no need to download it again. Paths are resolved automatically to the project root.
 
-## 已跑出的結果（真實數據跑出，唔係預填）
+## Results (run on real data, not pre-filled)
 
-- 整體違約率 **22.12%**（6,636 / 30,000），違約係少數類別。
-- 最強訊號係還款延遲：最近月延遲 2 個月（PAY_0 = 2）的客戶違約率 **69.1%**，延遲 3 個月 **75.8%**；半年內最嚴重延遲 7 個月更高見 83.6%。
-- 信用額度最低四分位違約率 31.8%，最高四分位 14.0%。
-- Baseline（logistic regression，門檻 0.5，分層 80／20，random_state=42）：**AUC 0.7481、recall 0.3617、precision 0.6575、accuracy 0.8172**。
-- `class_weight='balanced'` 比較：recall 升至 0.5848，precision 跌至 0.4491，AUC 0.7486——預期中的取捨。
-- 係數方向大致與常識一致（延遲月數愈多，違約機會愈高）；但 `consecutive_delay` 呈負值，係因為同 `delay_months_cnt` 等欄位共線，面試講係數時要小心。
+- Overall default rate **22.12%** (6,636 / 30,000). Default is the minority class.
+- The strongest signal is repayment delay: clients delayed by 2 months in the most recent month (PAY_0 = 2) had a default rate of **69.1%**, and those delayed by 3 months had a rate of **75.8%**; the worst delay of 7 months in six months reached 83.6%.
+- The lowest credit-limit quartile had a default rate of 31.8%, compared with 14.0% in the highest quartile.
+- Baseline (logistic regression, threshold 0.5, stratified 80/20 split, random_state=42): **AUC 0.7481, recall 0.3617, precision 0.6575, accuracy 0.8172**.
+- `class_weight='balanced'` comparison: recall rose to 0.5848, while precision fell to 0.4491 and AUC was 0.7486 — the expected trade-off.
+- Coefficient directions are broadly consistent with common sense (more delay months mean a higher chance of default). However, `consecutive_delay` has a negative coefficient because it is collinear with `delay_months_cnt` and related fields, so be careful when discussing coefficient directions in interviews.
 
-## 下一步（按骨架四星期節奏）
+## Next steps (following the four-week plan in the skeleton)
 
-- [ ] `reports/findings.md` 初稿：3–5 個主要發現（01 號筆記本已有數字）
-- [ ] `03_tree_models.ipynb`：random forest，之後先試 XGBoost（共用同一個測試集）
-- [ ] SQL 五個檔（`01_create_raw.sql` 至 `05_validation.sql`）：骨架已有詳細清單 A–D
-- [ ] Power BI 三頁 dashboard（讀 `credit_features.csv` 同 `model_results.csv`）
-- [ ] README 定稿（GitHub 版大綱見骨架最後一節）
+- [ ] First draft of `reports/findings.md`: 3–5 key findings (the figures are already in notebook 01)
+- [ ] `03_tree_models.ipynb`: random forest, then XGBoost (using the same test set)
+- [ ] Five SQL files (`01_create_raw.sql` to `05_validation.sql`): the skeleton already has the detailed checklist A–D
+- [ ] Three-page Power BI dashboard (reading `credit_features.csv` and `model_results.csv`)
+- [ ] Final README (see the GitHub outline in the last section of the skeleton)
