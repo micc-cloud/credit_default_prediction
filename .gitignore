@@ -1,0 +1,12 @@
+# Raw source data — download from UCI, see README.md Dataset section.
+# Never push the original .xls to GitHub.
+data/raw/
+
+# Local-only interim file (one-off .xls -> CSV conversion, see sql/README.md).
+# Never push to GitHub.
+data/interim/
+
+# Local DuckDB database file. Never push to GitHub.
+data/*.duckdb
+*.duckdb
+*.duckdb.wal

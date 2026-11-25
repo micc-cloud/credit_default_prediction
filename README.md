@@ -4,18 +4,33 @@ UCI "Default of Credit Card Clients" dataset (Taiwan credit card clients, April�
 
 > Note: This is old data from Taiwan in 2005. It is suitable only as a portfolio demonstration. It does not represent the current Hong Kong market, and it is not a real credit model used by any bank.
 
+## Dataset
+
+- Dataset: Default of Credit Card Clients, UCI Machine Learning Repository
+- Dataset page: https://archive.ics.uci.edu/dataset/350/default+of+credit+card+clients
+- DOI: https://doi.org/10.24432/C55S3H
+- Direct download (.zip): https://archive.ics.uci.edu/static/public/350/default+of+credit+card+clients.zip
+- Raw file is included in this repo at `raw data/Default of Credit Card Clients.xls` (uploaded 2026-11-26 via GitHub web, 2,867,294 bytes). Content verified identical to the local `data/raw/` copy (30,000 rows, cell-for-cell match, 2026-11-26); the .xls file size differs only due to Excel encoding. The UCI download links above remain the original source.
+- Processed file `data/processed/credit_features.csv` is included in this repo
+
 ## File structure
 
 ```
 credit-default-project/
 ├── data/
-│   ├── raw/          # Original UCI file (included, no need to download again)
+│   ├── raw/          # Not included in repo — download from UCI, see Dataset section
 │   └── processed/    # credit_features.csv (output of notebook 01)
 ├── notebooks/
 │   ├── 01_eda.ipynb                  # Exploratory analysis (runs clean)
 │   └── 02_baseline_logistic.ipynb   # Logistic regression baseline (runs clean)
 ├── reports/
 │   └── model_results.csv             # Model results table
+├── sql/
+│   ├── 01_create_raw.sql             # Load raw data into credit_raw
+│   ├── 02_profile_checks.sql         # Read-only profiling checks
+│   ├── 03_clean.sql                  # Build the cleaned table credit_clean
+│   └── README.md                     # How to run DuckDB and the cleaning decisions
+├── raw data/                         # Raw file uploaded by user via GitHub web on 2026-11-26 — see Dataset section
 └── README.md
 ```
 
@@ -24,7 +39,7 @@ credit-default-project/
 1. Install the requirements: `pip install pandas scikit-learn matplotlib python-calamine`
    (On older pandas versions, use `xlrd` to read the `.xls` file.)
 2. Run the notebooks in order: `01_eda.ipynb` → `02_baseline_logistic.ipynb` (Restart & Run All).
-3. The raw data is already in `data/raw/`; there is no need to download it again. Paths are resolved automatically to the project root.
+3. Download the raw .xls from UCI (see Dataset section) and place it in `data/raw/`. Paths are resolved automatically to the project root.
 
 ## Results (run on real data, not pre-filled)
 
@@ -39,6 +54,7 @@ credit-default-project/
 
 - [ ] First draft of `reports/findings.md`: 3–5 key findings (the figures are already in notebook 01)
 - [ ] `03_tree_models.ipynb`: random forest, then XGBoost (using the same test set)
-- [ ] Five SQL files (`01_create_raw.sql` to `05_validation.sql`): the skeleton already has the detailed checklist A–D
+- [x] SQL `01_create_raw.sql` to `03_clean.sql` plus `sql/README.md`: done and tested (30,000 rows, default rate 22.12%)
+- [ ] SQL `04_features.sql` and `05_validation.sql` plus `run_all.sql`: to be written after 01–03 are on GitHub
 - [ ] Three-page Power BI dashboard (reading `credit_features.csv` and `model_results.csv`)
 - [ ] Final README (see the GitHub outline in the last section of the skeleton)
