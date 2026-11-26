@@ -1,0 +1,35 @@
+name: smoke-test
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  smoke-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Smoke test (data loading, features, SQL 01-03, model)
+        run: python scripts/smoke_test.py
+      - name: Run notebook 01 (EDA, regenerates credit_features.csv)
+        run: |
+          jupyter nbconvert --to notebook --execute notebooks/01_eda.ipynb \
+            --output 01_eda.ipynb --output-dir notebooks \
+            --ExecutePreprocessor.allow_errors=False
+      - name: Run notebook 02 (baseline, regenerates model_results.csv)
+        run: |
+          jupyter nbconvert --to notebook --execute notebooks/02_baseline_logistic.ipynb \
+            --output 02_baseline_logistic.ipynb --output-dir notebooks \
+            --ExecutePreprocessor.allow_errors=False
+      - name: Check regenerated outputs exist
+        run: |
+          test -f data/processed/credit_features.csv
+          test -f reports/model_results.csv
+          python -c "import pandas as pd; f=pd.read_csv('data/processed/credit_features.csv'); assert f.shape==(30000,36), f.shape; print('credit_features.csv OK', f.shape)"
