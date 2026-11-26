@@ -70,26 +70,29 @@ must be read before any cleaning decision is applied. Do not run `05` before
 The database file `data/credit_default.duckdb` is local only. It is listed in
 `.gitignore` and is never pushed to GitHub.
 
-## Step 0 — Convert the raw .xls to CSV (one-off, reproducible)
+## Step 0 — Convert the tracked TSV to CSV (one-off, reproducible)
 
-DuckDB cannot read the old `.xls` (Excel 97–2003) format directly, so the raw
-file is converted to CSV once, using exactly the same read logic as notebook
-`01_eda.ipynb`. The raw `.xls` is never edited.
+The tracked raw file is tab-separated text, not an Excel workbook
+(see the main `README.md` Dataset section). It is converted to CSV
+once, using exactly the same read logic as notebook `01_eda.ipynb`
+(`src/data_loading.py`). No Excel reader is involved.
 
 Reproducible steps (run from the project root):
 
 ```python
-import pandas as pd
+import sys
+sys.path.insert(0, "src")
 from pathlib import Path
+from data_loading import load_raw_tsv, assert_raw_schema, write_interim_csv
 
 base = Path(".")
-raw = base / "data/raw/default of credit card clients.xls"
+raw = base / "raw data/Default of Credit Card Clients.tsv"
 
-# header=1: the first row is a header row (X1, X2, ...);
+# sep="\t", header=1: the first row is a header row (X1, X2, ...);
 # the real column names are in the second row.
-df = pd.read_excel(raw, header=1, engine="calamine")
-df = df.rename(columns={"default payment next month": "default_payment_next_month"})
-df.to_csv(base / "data/interim/credit_raw.csv", index=False)
+df = load_raw_tsv(raw)
+assert_raw_schema(df)  # 30,000 rows, 25 columns, unique ID, 0 nulls, 6,636 defaults
+write_interim_csv(df, base)
 
 print(df.shape)  # must be (30000, 25)
 print("ID unique:", df["ID"].is_unique)  # must be True
@@ -97,13 +100,15 @@ print("Missing values:", int(df.isna().sum().sum()))  # must be 0
 print("Default rate:", round(df["default_payment_next_month"].mean() * 100, 2), "%")  # 22.12
 ```
 
-Requirements: `pandas` and `python-calamine`
-(`pip install pandas python-calamine`).
+Requirements: `pandas` only (`pip install -r requirements.txt`).
+`scripts/validate_sql.py` runs this step automatically if the interim
+CSV is missing.
 
 The interim file `data/interim/credit_raw.csv` is local only. It is listed in
-`.gitignore` and is never pushed to GitHub. Only the raw `.xls` source (from
-UCI, see the main `README.md` Dataset section) and the processed
-`data/processed/credit_features.csv` belong in the repo.
+`.gitignore` and is never pushed to GitHub. The tracked raw TSV and the processed
+`data/processed/credit_features.csv` belong in the repo. A genuine UCI
+`.xls` may be kept locally under `data/raw/` for cross-checking only;
+it is ignored by git and is not needed to reproduce this project.
 
 ## Cleaning decisions (summary)
 

@@ -5,7 +5,7 @@
 -- Approval: SQL technical proposal v2 approved by the user on 2026-11-25 23:12.
 --           Approved for push 2026-11-26 (overnight Part 1): Jensen review passed; user waived per-file approval for this batch only.
 --
--- What this file does (skeleton, section C — the core cleaning list):
+-- What this file does (the core cleaning list, see sql/README.md):
 --   Build credit_clean from credit_raw. All transformations happen here.
 --   credit_raw is never modified. No rows are deleted.
 --
@@ -40,7 +40,7 @@
 --   4. BILL_AMT1–BILL_AMT6 — negative values flagged, not deleted.
 --      A negative bill may come from a refund or an adjustment and should
 --      be confirmed with the business. In this portfolio it is kept and
---      flagged (skeleton: "flag first, do not delete directly").
+--      flagged ("flag first, do not delete directly").
 --      Two columns are added (Jensen v2 decision):
 --        has_negative_bill_amt (0/1): 1 if any of BILL_AMT1–BILL_AMT6 < 0.
 --        negative_bill_months_cnt (0–6): how many of the six months < 0.
