@@ -1,10 +1,16 @@
-# Raw source data — download from UCI, see README.md Dataset section.
-# Never push the original .xls to GitHub.
+# Local genuine UCI .xls only (cross-check, not needed to reproduce).
+# The tracked raw file is `raw data/Default of Credit Card Clients.tsv`
+# and is NOT ignored. Never push a local .xls to GitHub.
 data/raw/
 
-# Local-only interim file (one-off .xls -> CSV conversion, see sql/README.md).
+# Local-only interim file (one-off TSV -> CSV conversion, see sql/README.md).
 # Never push to GitHub.
 data/interim/
+
+# Local virtual environment and notebook checkpoints.
+.venv/
+__pycache__/
+.ipynb_checkpoints/
 
 # Local DuckDB database file. Never push to GitHub.
 data/*.duckdb
