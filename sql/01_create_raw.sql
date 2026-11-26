@@ -9,6 +9,8 @@
 --   1. Create the raw table credit_raw from the interim CSV.
 --   2. Rename the target column to default_payment_next_month.
 --   3. Check that the load is complete: 30,000 rows, ID unique, 0 nulls.
+--   The null_total check is enforced by scripts/validate_sql.py, which
+--   exits non-zero if any documented invariant fails.
 --
 -- What this file does NOT do:
 --   - No cleaning, no recoding, no deletion. All transformations belong in
@@ -17,12 +19,12 @@
 --     is local only (see sql/README.md).
 --
 -- Input: data/interim/credit_raw.csv
---   This is a one-off conversion of the original .xls file. DuckDB cannot
---   read the old .xls format directly. The conversion is reproducible and
---   documented in sql/README.md (Step 0): pandas read_excel with header=1
---   (the first row is a header row X1, X2, ...; the real column names are
---   in the second row), engine="calamine". The original .xls is never edited.
---   The interim CSV is local only and is never pushed to GitHub.
+--   This is a one-off conversion of the tracked TSV raw file. The
+--   conversion is reproducible and documented in sql/README.md
+--   (Step 0): pandas read_csv with sep="\t", header=1 (the first row
+--   is a header row X1, X2, ...; the real column names are in the
+--   second row). No Excel reader is used. The interim CSV is local
+--   only and is never pushed to GitHub.
 --
 -- Original column mapping (UCI file, X1–X23 plus Y):
 --   X1  -> LIMIT_BAL                  Credit limit (TWD, incl. family cards)
@@ -114,9 +116,39 @@ FROM read_csv(
 -- Load checks (must all pass before moving to 02_profile_checks.sql):
 --   row_count = 30,000; id_unique = 30,000; null_total = 0;
 --   default_1 = 6,636; default_rate = 22.12%.
+--   These rows are informational in SQL; scripts/validate_sql.py
+--   asserts the same values and exits non-zero on failure.
 SELECT 'row_count' AS check_name, COUNT(*) AS value FROM credit_raw
 UNION ALL
 SELECT 'id_unique', COUNT(DISTINCT ID) FROM credit_raw
+UNION ALL
+SELECT 'null_total', (
+    SUM(CASE WHEN ID IS NULL THEN 1 ELSE 0 END)
+  + SUM(CASE WHEN LIMIT_BAL IS NULL THEN 1 ELSE 0 END)
+  + SUM(CASE WHEN SEX IS NULL THEN 1 ELSE 0 END)
+  + SUM(CASE WHEN EDUCATION IS NULL THEN 1 ELSE 0 END)
+  + SUM(CASE WHEN MARRIAGE IS NULL THEN 1 ELSE 0 END)
+  + SUM(CASE WHEN AGE IS NULL THEN 1 ELSE 0 END)
+  + SUM(CASE WHEN PAY_0 IS NULL THEN 1 ELSE 0 END)
+  + SUM(CASE WHEN PAY_2 IS NULL THEN 1 ELSE 0 END)
+  + SUM(CASE WHEN PAY_3 IS NULL THEN 1 ELSE 0 END)
+  + SUM(CASE WHEN PAY_4 IS NULL THEN 1 ELSE 0 END)
+  + SUM(CASE WHEN PAY_5 IS NULL THEN 1 ELSE 0 END)
+  + SUM(CASE WHEN PAY_6 IS NULL THEN 1 ELSE 0 END)
+  + SUM(CASE WHEN BILL_AMT1 IS NULL THEN 1 ELSE 0 END)
+  + SUM(CASE WHEN BILL_AMT2 IS NULL THEN 1 ELSE 0 END)
+  + SUM(CASE WHEN BILL_AMT3 IS NULL THEN 1 ELSE 0 END)
+  + SUM(CASE WHEN BILL_AMT4 IS NULL THEN 1 ELSE 0 END)
+  + SUM(CASE WHEN BILL_AMT5 IS NULL THEN 1 ELSE 0 END)
+  + SUM(CASE WHEN BILL_AMT6 IS NULL THEN 1 ELSE 0 END)
+  + SUM(CASE WHEN PAY_AMT1 IS NULL THEN 1 ELSE 0 END)
+  + SUM(CASE WHEN PAY_AMT2 IS NULL THEN 1 ELSE 0 END)
+  + SUM(CASE WHEN PAY_AMT3 IS NULL THEN 1 ELSE 0 END)
+  + SUM(CASE WHEN PAY_AMT4 IS NULL THEN 1 ELSE 0 END)
+  + SUM(CASE WHEN PAY_AMT5 IS NULL THEN 1 ELSE 0 END)
+  + SUM(CASE WHEN PAY_AMT6 IS NULL THEN 1 ELSE 0 END)
+  + SUM(CASE WHEN default_payment_next_month IS NULL THEN 1 ELSE 0 END)
+) FROM credit_raw
 UNION ALL
 SELECT 'default_1', SUM(default_payment_next_month) FROM credit_raw
 UNION ALL
