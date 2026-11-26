@@ -1,0 +1,17 @@
+# Reproducible environment for the credit default prediction project.
+# Python 3.12. Pin the libraries that the notebooks, SQL runner and
+# smoke test actually use. scikit-learn >= 1.5 is required:
+# OneHotEncoder(drop="first", sparse_output=False) and
+# SimpleImputer inside a Pipeline are used in notebook 02.
+# No Excel reader is needed: the canonical raw file is TSV
+# (see README.md, Dataset section), so python-calamine / xlrd are
+# intentionally NOT listed here.
+python==3.12.*
+pandas>=2.0,<2.3
+numpy>=1.26,<2.3
+scikit-learn>=1.5,<1.7
+matplotlib>=3.8,<3.10
+duckdb>=1.0,<2.0
+jupyter>=1.0
+nbconvert>=7.0
+ipykernel>=6.0
