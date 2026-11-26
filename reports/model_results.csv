@@ -1,3 +1,4 @@
-Model,AUC,Recall (default),Precision (default),Accuracy,Notes
-Logistic regression (baseline),0.748065132619833,0.3617181612660136,0.6575342465753424,0.8171666666666667,"threshold 0.5; stratified 80/20, random_state=42"
-Logistic regression (class_weight=balanced),0.7485702066626878,0.584777694046722,0.44907407407407407,0.7495,"threshold 0.5; stratified 80/20, random_state=42"
+Model,Split,AUC,Recall (default),Precision (default),Accuracy,Notes
+Logistic regression (baseline),"CV (train only, 5-fold)",0.7692246288399742,0.3691858762387046,0.6605241193652714,0.8184583333333333,"5-fold stratified CV on train only, random_state=42"
+Logistic regression (class_weight=balanced),"CV (train only, 5-fold)",0.7700238716818826,0.6125467037989603,0.46986046880779025,0.7612916666666667,"5-fold stratified CV on train only, random_state=42"
+Logistic regression (class_weight=balanced),Final test (selected model only),0.753879450823898,0.5817633760361718,0.45545722713864306,0.7536666666666667,"threshold 0.5; stratified 80/20, random_state=42; selected by 5-fold CV AUC on train only"
