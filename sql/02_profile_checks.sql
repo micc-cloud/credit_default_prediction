@@ -6,7 +6,7 @@
 --           Approved for push 2026-11-26 (overnight Part 1): Jensen review passed; user waived per-file approval for this batch only.
 --
 -- What this file does:
---   Profile credit_raw BEFORE any cleaning (skeleton, section B).
+--   Profile credit_raw BEFORE any cleaning (see sql/README.md).
 --   Read the results first; do not rush to change anything.
 --
 -- What this file does NOT do:
